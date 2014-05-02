@@ -206,13 +206,12 @@ SchedulerClient = FleetClient
 CONTAINER_TEMPLATE = """
 [Unit]
 Description={name}
-After=docker.service
-Requires=docker.service
 
 [Service]
 ExecStartPre=/usr/bin/docker pull {image}
-ExecStart=-/usr/bin/docker run --name {name} -P -e PORT={port} {image} {command}
-ExecStop=-/usr/bin/docker rm -f {name}
+ExecStartPre=/bin/sh -c "docker inspect {name} >/dev/null && docker rm -f {name} || true"
+ExecStart=/usr/bin/docker run --name {name} -P -e PORT={port} {image} {command}
+ExecStop=/usr/bin/docker rm -f {name}
 """
 
 ANNOUNCE_TEMPLATE = """
